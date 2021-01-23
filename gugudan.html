@@ -12,59 +12,51 @@
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const e = React.createElement;
-      class GuGuDan extends React.Component {
-        constructor(props) {
-          super(props);
-          this.state = {
-            first: Math.ceil(Math.random() * 9),
-            second: Math.ceil(Math.random() * 9),
-            value: "",
-            result: "",
-          };
-        }
-        
-        onSubmit = (e) => {
-          e.preventDefault();
-          if (parseInt(this.state.value) === this.state.first * this.state.second) {
-            this.setState({
-              result: `${this.state.first * this.state.second} 정답!`,
-              first: Math.ceil(Math.random() * 9),
-              second: Math.ceil(Math.random() * 9),
-              value: "",
-            });
-          } else {
-            this.setState({
-              result: "땡",
-              value: "",
-            });
-          }
+      const GuGuDan = () => {
+        const [first, setFirst] = React.useState(Math.ceil(Math.random()*9));
+        const [second, setSecond] = React.useState(Math.ceil(Math.random()*9));
+        const [value, setValue] = React.useState('');
+        const [result, setResult] = React.useState('');
+        const inputRef = React.useRef(null);
+
+        const onChangeInput = (e) => {
+          setValue(e.target.value);
         };
 
-        onChange = (e) => this.setState({ value: e.target.value })
+        const onSubmitForm = (e) => {
+          e.preventDefault();
+          if (
+            parseInt(value) === first*second) {
 
-        render() {
-          return (
-            <React.Fragment>
-              <div>
-                {this.state.first}곱하기 {this.state.second}은(는)?
-              </div>
-              <form onSubmit={this.onSubmit}>
-                <input
-                  type="number"
-                  value={this.state.value}
-                  onChange={this.onChange}
-                />
-                <button>입력!</button>
-              </form>
-              <div>{this.state.result}</div>
-            </React.Fragment>
-          );
+              setFirst(Math.ceil(Math.random() * 9));
+              setSecond(Math.ceil(Math.random() * 9));
+              setResult('정답');
+              //Hooks에서도 setState류의 메서드를 사용할 때, 매개변수를 함수로 전달할 수 있다. 해당 state의 직전값을 사용할 때.
+              setValue('');
+              inputRef.current.focus();
+              //Hooks의 setState류 메서드는 비동기이기 때문에, 리액트는 관련 state변화를 모아서 한번만 렌더링한다.
+            } else {
+              setResult('땡!');
+              setValue('');
+              inputRef.current.focus();
+            } //DOM에 접근할 때 current 필수..
         }
-      }
+
+        return (
+          <React.Fragment>
+            <div>{first} 곱하기 {second} 는(은)?</div>
+            <form onSubmit={onSubmitForm}>
+              <input ref={inputRef} onChange={onChangeInput} value={value}/>
+              <button id="button">입력!</button>
+            </form>
+            <div id="result">{result}</div>
+          </React.Fragment>
+        );
+      } // JSX의 XML 문법에서 class attribute를 쓰면 안된다. className으로 변경, for는 htmlFor 로 변경.
+      //state 변경시, 함수형 컴포넌트는 함수 전체가 재실행되어버린다. (클래스 컴포넌트는 render함수만 ..)
     </script>
     <script type="text/babel">
-      ReactDOM.render(<div><GuGuDan /><GuGuDan /><GuGuDan /></div>, document.querySelector("#root"));
+      ReactDOM.render(<GuGuDan />, document.querySelector("#root"));
     </script>
     <!-- JSX문법을 사용하려면 type="text/babel" 넣어줘야 된다-->
   </body>

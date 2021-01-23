@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <!-- 프로덕션 버전은 development를 production으로 변경 -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const e = React.createElement;
+      class GuGuDan extends React.Component {
+        constructor(props) {
+          super(props);
+
+          this.state = {
+            first: Math.ceil(Math.random() * 9),
+            second: Math.ceil(Math.random() * 9),
+            value: "",
+            result: "",
+          };
+        }
+
+        onSubmit = (e) => {
+          e.preventDefault();
+          if (
+            parseInt(this.state.value) ===
+            this.state.first * this.state.second
+          ) {
+            this.setState((prevState) => {
+              return {
+                result: `${prevState.value} 정답!`,
+                first: Math.ceil(Math.random() * 9),
+                second: Math.ceil(Math.random() * 9),
+                value: "",
+              };
+            });
+            this.input.focus();
+          } else {
+            this.setState({
+              result: "땡",
+              value: "",
+            });
+            this.input.focus();
+          }
+        };
+        // 미래의 state값과 현재의 state값이 뒤섞여있을 때(this.state를 setState 안에서 호출할 때), setState 메서드 안에 prevState를 매개변수로 하는 함수(prevState)=>{}를 정의하고 state 객체를 return 한다.
+        //setState는 비동기
+
+        onChange = (e) => this.setState({ value: e.target.value });
+        // JSX내에서 함수를 임의 선언(생성)하면 메모리의 낭비이므로, 밖으로 빼서 재사용한다.
+
+        onRefInput = (c) => {
+          this.input = c;
+        };
+        input;
+        // DOM 조작을 위해 ref를 사용한다.
+
+        render() {
+          return (
+            <React.Fragment>
+              <div>
+                {this.state.first}곱하기 {this.state.second}은(는)?
+              </div>
+              <form onSubmit={this.onSubmit}>
+                <input
+                  ref={this.onRefInput}
+                  type="number"
+                  value={this.state.value}
+                  onChange={this.onChange}
+                />
+                <button>입력!</button>
+              </form>
+              <div>{this.state.result}</div>
+            </React.Fragment>
+          );
+        }
+      }
+    </script>
+    <script type="text/babel">
+      ReactDOM.render(
+        <div>
+          <GuGuDan />
+        </div>,
+        document.querySelector("#root")
+      );
+    </script>
+    <!-- JSX문법을 사용하려면 type="text/babel" 넣어줘야 된다-->
+  </body>
+</html>
