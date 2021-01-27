@@ -1,13 +1,11 @@
-const React = require("react");
-const { Component } = React;
+import React from 'react';
 
-class Try extends Component {
-    render() {
-        return(
-            <li key={this.props.index}><b>{this.props.value.fruit}</b> - {this.props.value.taste}</li>
-        )
-    };
+const Try = ({ tryInfo }) => {
+    return (<li>
+      <div>{tryInfo.try}</div>
+      <div>{tryInfo.result}</div>
+    </li>
+    )
+  };
 
-}
-
-module.exports = Try;
+export default Try;
