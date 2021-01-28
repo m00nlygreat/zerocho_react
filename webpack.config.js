@@ -1,6 +1,8 @@
 const path = require("path");
 const RefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
+// process.env.NODE_ENV = 'production';
+// 프로덕션에서는 이 코드를 넣어주고 아래 mode: 역시 'production'으로 바꿔준다.
 
 module.exports = {
   name: "react-webgame",

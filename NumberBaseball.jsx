@@ -11,7 +11,7 @@ function getNumbers() {
     array.push(chosen);
   }
   return array;
-} // this를 사용하지 않는 함수는 컴포넌트 바깥에 있어도 된다. 그러면 다른 데서도 사용 가능하지만, 그럴 일은 잘 없다
+} // this를 사용하지 않는 함수는 컴포넌트 바깥에 있어도 된다. 그러면 다른 데서도 사용 가능하지만, 사실 그럴 일은 잘 없다
 
 const NumberBaseball = () => {
   const [result, setResult] = useState("");
