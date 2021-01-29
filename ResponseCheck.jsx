@@ -10,6 +10,8 @@ class ResponseCheck extends Component {
   timeout;
   startTime;
   endTime;
+  // 클래스 안에 사용할 변수를 미리 선언한다.
+  // timeout은 실패시 초기화 하기 위해 선언해두어야 함.
 
   randomSecond = () => {
     return Math.floor(Math.random() * 1000) + 2000;
@@ -48,10 +50,20 @@ class ResponseCheck extends Component {
       });
     }
   };
+
+  onReset = () => {
+    this.setState({
+      result: [],
+    });
+  }
+
   renderAverage = () => {
     const { state, message, result } = this.state;
     return result.length === 0 ? null : (
-      <div>평균시간: {result.reduce((a, c) => a + c) / result.length}ms</div>
+      <>
+      <div>반응 속도: {result.reduce((a, c) => a + c) / result.length}ms</div>
+      <button onClick={this.onReset}>리셋</button>
+      </>
     );
   };
 
