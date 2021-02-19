@@ -30,8 +30,7 @@ const RSP = () => {
     return(() => {clearInterval(interval.current);});
   },[imgCoord]); 
   
-  // useEffect는 componentDidMount, componentDidUnmount의 역할, 두번째 인수인 배열에 넣은 state가 변경될 때 useEffect가 실행된다
-  // 두 번째 인수로 아무것도 넣지 않으면, 처음 한 번만 실행된다.
+
 
   const changeHand = () => {
     if (imgCoord === rspCoords.바위) {setImgCoord(rspCoords.가위);} 
@@ -90,3 +89,15 @@ const RSP = () => {
 export default RSP;
 
 // https://en.pimg.jp/023/182/267/1/23182267.jpg
+
+  // useEffect는 componentDidMount, componentDidUnmount의 역할, 두번째 인수인 배열에 넣은 state가 변경될 때 useEffect가 실행된다
+  // 두 번째 인수로 아무것도 넣지 않으면, 처음 한 번만 실행된다.
+  // 여러 state에 대해서 useEffect를 여러번 쓸 수 있다
+  // 그러나 class에서는 componentDidMount, componentDidUnmount 등에서 조건문으로 state마다 분기처리 해줘야 한다.
+  // 부모 컴포넌트가 리렌더될 때, 자식 역시 반드시 리렌더 되므로, memo 등을 사용해 퍼포먼스를 유지한다.
+
+  // |                      | useEffect(()=>{},[result]) | useEffect(()=>{},[imgCoord]) | useEffect(()=>{},[score]) |
+  // |----------------------|----------------------------|------------------------------|---------------------------|
+  // | componentDidMount    | result                     | imgCoord                     | score                     |
+  // | componentDidUpdate   | result                     | imgCoord                     | score                     |
+  // | componentWillUnmount | result                     | imgCoord                     | score                     |
