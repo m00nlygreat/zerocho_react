@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const rspCoords = {
   바위: "0",
@@ -18,120 +18,75 @@ const computerChoice = (imgCoord) => {
   })[0];
 };
 
-class RSP extends Component {
-  state = {
-    result: "",
-    imgCoord: "0",
-    score: 0,
+const RSP = () => {
+  const [result, setResult] = useState("");
+  const [imgCoord, setImgCoord] = useState(rspCoords.바위);
+  const [score, setScore] = useState(0);
+  const interval = useRef();
+
+  useEffect(() => {
+    interval.current = setInterval(changeHand, 200);
+    
+    return(() => {clearInterval(interval.current);});
+  },[imgCoord]); 
+  
+  // useEffect는 componentDidMount, componentDidUnmount의 역할, 두번째 인수인 배열에 넣은 state가 변경될 때 useEffect가 실행된다
+  // 두 번째 인수로 아무것도 넣지 않으면, 처음 한 번만 실행된다.
+
+  const changeHand = () => {
+    if (imgCoord === rspCoords.바위) {setImgCoord(rspCoords.가위);} 
+    else if (imgCoord === rspCoords.가위) {setImgCoord(rspCoords.보);} 
+    else if (imgCoord === rspCoords.보) {setImgCoord(rspCoords.바위);}
   };
 
-  interval;
-
-  componentDidMount() {
-    this.interval = setInterval(this.changeHand, 200);
-  } // 처음 렌더 되고 이것이 실행됨. setInterval 등의 비동기 요청에 많이 사용.
-
-  componentDidUpdate() {} // 컴포넌트가 리렌더 될 때마다
-
-  componentWillUnmount() {
-      clearInterval(this.interval);
-  } // 컴포넌트가 제거되기 직전. 부모가 this(자식)을 없앴을때. 없앤다는 건 어떻게 하는건가?
-
-  changeHand = () => {
-    const { imgCoord } = this.state;
-
-    if (imgCoord === rspCoords.바위) {
-      this.setState({
-        imgCoord: rspCoords.가위,
-      });
-    } else if (imgCoord === rspCoords.가위) {
-      this.setState({
-        imgCoord: rspCoords.보,
-      });
-    } else if (imgCoord === rspCoords.보) {
-      this.setState({
-        imgCoord: rspCoords.바위,
-      });
-    }
-  };
-
-  onClickBtn = (choice) => (e) => {
-    clearInterval(this.interval);
-
-    const { imgCoord } = this.state;
+  const onClickBtn = (choice) => (e) => {
+    clearInterval(interval.current);
 
     const myScore = scores[choice];
     const cpuScore = scores[computerChoice(imgCoord)];
     const diff = myScore - cpuScore;
 
     if (diff === 0) {
-      this.setState({
-        result: "비겼습니다!",
-      });
+      setResult('비겼습니다!');
     } else if ([-1, 2].includes(diff)) {
-      this.setState((prevState) => {
-        return {
-          result: "이겼습니다!",
-          score: prevState.score + 1,
-        };
-      });
+      setResult('이겼습니다!');
+      setScore((prev) => prev + 1);
     } else {
-      this.setState((prevState) => {
-        return {
-          result: "졌습니다!",
-          score: prevState.score - 1,
-        };
-      });
+      setResult('졌습니다!');
+      setScore((prev) => prev - 1);
     }
+
     setTimeout(() => {
-      this.interval = setInterval(this.changeHand, 200);
+      interval.current = setInterval(changeHand, 200);
     }, 500);
-  }; // 고차 함수라고 불리는데, 원래 onClick에 들어가야 했을 (e) => 가 호출하는 함수에 중첩으로 들어가 있는 것이다. 왜 그런 진 잘 모르겠음.
 
-  render() {
-    const { result, imgCoord, score } = this.state;
+  }; // 여기서는 e를 안쓰니 필요 없지만 ... 고차함수 기억하기 위해 써놓았다.
 
-    return (
-      <>
-        <div
-          id="computer"
-          style={{
-            background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${imgCoord} 0`,
-          }}
-        />
-        <div>
-          <button
-            id="rock"
-            className="btn"
-            onClick={this.onClickBtn("바위")}
-          >
-            바위
-          </button>
-          <button
-            id="scissor"
-            className="btn"
-            onClick={this.onClickBtn("가위")}
-          >
-            가위
-          </button>
-          <button
-            id="paper"
-            className="btn"
-            onClick={this.onClickBtn("보")}
-          >
-            보
-          </button>
-        </div>
-        <div>{result}</div>
-        <div>현재 {score} 점</div>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <div
+        id="computer"
+        style={{
+          background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${imgCoord} 0`,
+        }}
+      />
+      <div>
+        <button id="rock" className="btn" onClick={onClickBtn("바위")}>
+          바위
+        </button>
+        <button id="scissor" className="btn" onClick={onClickBtn("가위")}>
+          가위
+        </button>
+        <button id="paper" className="btn" onClick={onClickBtn("보")}>
+          보
+        </button>
+      </div>
+      <div>{result}</div>
+      <div>현재 {score} 점</div>
+    </>
+  );
+};
 
 export default RSP;
 
 // https://en.pimg.jp/023/182/267/1/23182267.jpg
-
-// 클래스의 경우
-// constructor() -> render() -> ref -> componentDidMount() -> setState/props_changed -> shouldComponentUpdate(true) -> render() -> componentDidUpdate() -> (소멸될 때) componentWillUnmount()
