@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import Ball from './Ball';
 
 function getWinNumbers() {
@@ -17,78 +17,64 @@ function getWinNumbers() {
   return [...winNumbers, bonusNumber];
 }
 
-class Lotto extends Component {
+const Lotto = () => {
+  const lottoNumbers = useMemo(()=>getWinNumbers(), []);
+  // 두 번째 인자의 값이 변경되지 않는 한 다시 실행되지 않는다
+  // hooks 에서는 함수 컴포넌트가 매번 다시 실행되는데, 여기서 함수의 리턴값이 변경되지 않게 하기 위해 useMemo를 사용
 
-  state = {
-    winNumbers: getWinNumbers(),
-    winBalls: [],
-    bonus: null,
-    redo: false,
-  };
+  const [winNumbers, setWinNumbers] = useState(lottoNumbers);
+  const [winBalls, setWinBalls] = useState([]);
+  const [bonus, setBonus] = useState(null);
+  const [redo, setRedo] = useState(false);
+  const timeouts = useRef([]);
 
-  timeouts = [];
+  useEffect(()=>{
 
+    console.log('useEffect');
 
-  runTimeouts = () => {
-    const { winNumbers } = this.state;
     for (let i = 0; i < winNumbers.length - 1; i++) {
-      this.timeouts[i] = setTimeout(()=>{
-        this.setState((prev)=>{
-        return {
-          winBalls : [ ...prev.winBalls, winNumbers[i]],
-        };}
-        )
-      }, (i+1) * 1000);
-      this.timeouts[6] = setTimeout(()=>{
-        this.setState({
-          bonus: winNumbers[6],
-          redo: true,
-        });
-      }, 7000);
-    }
-  }
-  componentDidMount() {
-    this.runTimeouts();
-  } // let을 사용하여 변수를 선언하면 클로저 문제 안생김... 리얼?
-  
-  componentDidUpdate(pProps, pState) {
-    if (this.state.winBalls.length === 0) {
-      this.runTimeouts();
-    }
-  } // props와 state를 비교하여, 업데이트시마다 실행할 구문을 적어준다.
+      timeouts.current[i] = setTimeout(()=>{setWinBalls((prev)=>[ ...prev, winNumbers[i]]);}, (i+1) * 1000);
+      timeouts.current[6] = setTimeout(()=>{setBonus(winNumbers[6]);setRedo(true);}, 7000);
+    } // runTimeouts
 
-  componentWillUnmount() {
-    this.timeouts.forEach((v) => {
-      clearTimeout(v);
-    });
-  }
+    return () => {
+      timeouts.current.forEach((v)=>{
+        clearTimeout(v);
+      })
+    };  // componentWillUnmount
 
-  onClickRedo = () => {
-    this.setState({
-      winNumbers: getWinNumbers(),
-      winBalls: [],
-      bonus: null,
-      redo: false,
-    });
-    this.timeouts = [];
-  }
+  }, [timeouts.current]); 
 
-  render() {
-    const { winBalls, bonus, redo } = this.state;
-    return (
-      <>
-        <div>당첨 숫자</div>
-        <div id="결과창">
-          {winBalls.map((v) => (
-            <Ball key={v} number={v} />
-          ))}
-        </div>
-        <div>보너스!</div>
-        {bonus && <Ball number={bonus} />}
-        {redo && <button onClick={this.onClickRedo}>한번 더!</button>}
-      </>
-    );
-  }
+  // 두번째 인수가 빈 배열이면, componentDidMount와 같다.
+  // 배열에 요소가 있으면, componentDidMount와 componentDidUpdate 둘 다 수행
+
+  const onClickRedo = useCallback(() => {
+
+    setWinNumbers(getWinNumbers());
+    setWinBalls([]);
+    setBonus(null);
+    setRedo(false);
+
+    timeouts.current = [];
+  }, []);
+
+  // 함수 컴포넌트가 매번 재 실행될때, useCallback으로 함수를 감싸면, 해당 함수가 새로 선언되지 않는다.
+  // useCallback의 안에서 state를 사용하는 경우, 두 번째 인자에 그 state를 넣어줘야 한다. 그렇지 않으면 해당 state의 변화를 막는다.
+  // 자식 컴포넌트에 함수를 props로 전달할 때는 반드시 useCallback을 사용해야 한다. 띠용.. 안그러면 자식 컴포넌트가 항상 리렌더됨... 미쳤다 개어려워
+
+  return (
+    <>
+    <div>당첨 숫자</div>
+    <div id="결과창">
+      {winBalls.map((v) => (
+        <Ball key={v} number={v} />
+      ))}
+    </div>
+    <div>보너스!</div>
+    {bonus && <Ball number={bonus} onClick={onClickRedo} />}
+    {redo && <button onClick={onClickRedo}>한번 더!</button>}
+  </>
+  )
 }
 
 export default Lotto;
