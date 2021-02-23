@@ -28,6 +28,9 @@ const Lotto = () => {
   const [redo, setRedo] = useState(false);
   const timeouts = useRef([]);
 
+  // 조건에 따라 달리 실행되는 구문에 hooks를 사용하지 마라.
+  // 항상 같은 구조를 갖을 수 있게끔 함수 컴포넌트의 최상단에 선언할 것
+
   useEffect(()=>{
 
     console.log('useEffect');
@@ -44,6 +47,10 @@ const Lotto = () => {
     };  // componentWillUnmount
 
   }, [timeouts.current]); 
+
+  useEffect(()=>{
+    console.log('로또 숫자를 생성합니다.');
+  },[winNumbers]);
 
   // 두번째 인수가 빈 배열이면, componentDidMount와 같다.
   // 배열에 요소가 있으면, componentDidMount와 componentDidUpdate 둘 다 수행
@@ -78,3 +85,18 @@ const Lotto = () => {
 }
 
 export default Lotto;
+
+
+// useEffect를 단독으로 2번째 인수를 빈 배열로 사용하면 componentDidMount와 같은 효과이다
+// 2번째 인수가 빈배열이 아니더라도 ComponentDidMount 를 포함하여 효과를 낸다
+// 이것을 막기 위해, 즉 componentDidUpdate의 효과만을 내기 위해서 다음과 같은 패턴을 사용
+
+/*
+const mounted = useRef(false);
+useEffect(() => {
+ if (!mounted.current) {
+ mounted.current = true;
+ } else {
+ componentDidMount();
+}}, [감시할 값]);
+*/
