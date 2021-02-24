@@ -7,7 +7,9 @@ const initialState = {
     tableData: [['','',''],['','',''],['','','']],
 };
 
-const SET_WINNER = 'SET_WINNER';
+export const SET_WINNER = 'SET_WINNER';
+export const CLICK_CELL = 'CLICK_CELL';
+export const CHANGE_TURN = 'CHANGE_TURN';
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -16,6 +18,22 @@ const reducer = (state, action) => {
                 ...state,
                 winner: action.winner,
             }
+            case CLICK_CELL:
+
+            const tableData = [...state.tableData]; // 리액트의 불변성.. 무조건 state를 그대로 쓰지말고 얕은 복사 (spread, 전개 문법) 한다.
+            tableData[action.row] = [...tableData[action.row]];
+            tableData[action.row][action.cell] = state.turn;
+            
+            return {
+                ...state,
+                tableData,
+            };
+
+            case CHANGE_TURN:
+                return {
+                    ...state,
+                    turn: state.turn === 'O' ? 'X' : 'O',
+                };
     }
 };
 
@@ -29,7 +47,7 @@ const TicTacToe = () => {
 
     return(
         <>
-            <Table onClick={onClickTable} tableData={state.tableData}/>
+            <Table onClick={onClickTable} tableData={state.tableData} dispatch={dispatch}/>
             {state.winner && <div>{state.winner}님의 승리!</div>}
         </>
     )
