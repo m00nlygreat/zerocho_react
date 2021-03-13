@@ -1,5 +1,5 @@
 import React, { useReducer, useCallback, useEffect } from "react";
-import Table from "./Table";
+import Table from "./Table_ttt";
 
 const initialState = {
   winner: "",

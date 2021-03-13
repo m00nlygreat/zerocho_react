@@ -1,10 +1,16 @@
-import React from "react";
-import Tr from "./Tr";
+import React, { useContext } from 'react';
+import { TableContext } from './MineSweeper';
+import Tr from './Tr';
 
-const Table = ({onClick, tableData, dispatch}) => {
-  return <table>
-    {Array(tableData.length).fill().map((tr, i)=>(<Tr rowIndex={i} rowData={tableData[i]} dispatch={dispatch}/>))}
-    </table>;
-};
+const Table = () => {
+    const { tableData } = useContext(TableContext);
+    // value.tableData
+
+    return (
+        <table>
+            {Array(tableData.length).fill().map((tr, i) => <Tr rowIndex={i}/>)}
+        </table>
+    )
+}
 
 export default Table;
