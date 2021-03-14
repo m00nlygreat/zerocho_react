@@ -1,4 +1,4 @@
-import React, {useContext, useCallback} from 'react';
+import React, {useContext, useCallback, memo, useMemo} from 'react';
 import { TableContext, CODE, OPEN_CELL, CLICK_MINE, FLAG_CELL, QUESTION_CELL,NORMALIZE_CELL } from './MineSweeper';
 
 
@@ -43,7 +43,7 @@ const getTdText = (code) => {
   }
 };
 
-const Td = ({rowIndex, cellIndex}) => {
+const Td = memo(({rowIndex, cellIndex}) => {
     const {tableData, dispatch, halted} = useContext(TableContext);
     const cellData = tableData[rowIndex][cellIndex];
 
@@ -98,7 +98,7 @@ const Td = ({rowIndex, cellIndex}) => {
     onClick={onClickTd}
     onContextMenu={onRightClickTd}>
         {getTdText(cellData)}
-    </td>);
-}
+    </td>)
+});
 
 export default Td;
