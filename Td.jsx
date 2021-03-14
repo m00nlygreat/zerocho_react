@@ -51,8 +51,8 @@ const Td = ({rowIndex, cellIndex}) => {
         if (halted) {return;}
         switch (cellData) {
             case CODE.OPENED:
-            case CODE.FLAG_MINE:
             case CODE.FLAG:
+            case CODE.FLAG_MINE:
             case CODE.QUESTION:
             case CODE.QUESTION_MINE:
                 break;
